@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@import "tailwindcss";
+
+/* ============================================================
+   ip-calculator — eigenes Styling (aus dem ursprünglichen
+   <style>-Block). Tailwind oben + eigenes CSS hier vertragen
+   sich problemlos.
+   ============================================================ */
+
+:root {
+  --ink: #0e1419;
+  --text: #e7eef4;
+  --muted: #76858f;
+  --faint: #36424b;
+  --net: #57d6c6;   /* network bits */
+  --host: #f2b45c;  /* host bits / broadcast */
+  --bad: #f08486;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --sans: "Space Grotesk", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #16212a 0%, var(--ink) 55%) fixed;
+  color: var(--text);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 72px 28px 110px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 22px;
+}
+.eyebrow b { color: var(--net); font-weight: 600; }
+
+/* die Adresse, die du tippst — das lauteste Element der Seite */
+.field {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: clamp(30px, 8vw, 48px);
+  letter-spacing: -0.01em;
+  padding: 0;
+  outline: none;
+  caret-color: var(--net);
+}
+.field::selection { background: rgba(87,214,198,0.22); }
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  min-height: 18px;
+  margin: 10px 0 0;
+}
+.hint.err { color: var(--bad); }
+
+/* Prefix-Slider — Füllung läuft bis zum Schnitt */
+.prefix {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 40px 0 6px;
+}
+.prefix .num {
+  font-family: var(--mono);
+  font-size: 22px;
+  color: var(--net);
+  font-weight: 700;
+  min-width: 64px;
+}
+.prefix .lab { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  flex: 1; height: 2px; border-radius: 2px; margin: 0;
+  background: var(--faint); outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--net); border: 3px solid var(--ink);
+  box-shadow: 0 0 0 1px var(--net);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--net); border: 3px solid var(--ink);
+}
+
+/* Signatur: der 32-Bit-Streifen */
+.strip { margin: 34px 0 6px; }
+.octets { display: flex; gap: 18px; flex-wrap: wrap; }
+.octet { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.bits { display: flex; gap: 3px; }
+.bit {
+  width: clamp(13px, 3.4vw, 19px);
+  height: clamp(20px, 5vw, 26px);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px;
+  border-radius: 3px;
+  color: var(--ink);
+  transition: background-color .22s ease, opacity .22s ease;
+  position: relative;
+}
+.bit.net  { background: var(--net); }
+.bit.host { background: var(--host); opacity: 0.92; }
+/* der eine bedeutsame Trenner: der Prefix-Schnitt */
+.bit.cut::after {
+  content: ""; position: absolute; left: -3px; top: -7px; bottom: -7px;
+  width: 2px; border-radius: 2px; background: var(--text);
+}
+.dec { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+.legend {
+  display: flex; gap: 22px; margin: 22px 0 0;
+  font-size: 12px; color: var(--muted); letter-spacing: 0.04em;
+}
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; vertical-align: middle; }
+.legend .n i { background: var(--net); }
+.legend .h i { background: var(--host); }
+
+/* Ergebnisse — fließend, ohne Trennlinien dazwischen */
+.out { margin-top: 52px; display: grid; gap: 30px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.cell .k {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--muted); margin: 0 0 8px;
+}
+.cell .v {
+  font-family: var(--mono); font-size: clamp(20px, 5vw, 26px);
+  font-weight: 500; line-height: 1.15; word-break: break-all;
+}
+.v.net  { color: var(--net); }
+.v.host { color: var(--host); }
+.v .dim { color: var(--muted); }
+
+@media (max-width: 460px) {
+  .row2 { grid-template-columns: 1fr; }
+  #root { padding-top: 54px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
