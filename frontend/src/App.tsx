@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 
 // Beispiel-Bits fuer 192.168.1.0, Prefix /24 (erste 24 Bit = network)
 const octets = [
@@ -47,6 +47,25 @@ function Strip() {
 export default function App() {
 
   const [prefix, setPrefix] = useState(24);
+  const [ip, setIp] = useState(`192.168.1.1/${prefix}`);
+  const [result, setResult] = useState<{ ip: string; binary: string; error?: string } | null>(null);
+
+  useEffect(() =>
+  {
+    const ipWithoutPrefix = ip.split('/')[0];
+    setIp(`${ipWithoutPrefix}/${prefix}`);
+  }, [prefix]);
+
+  const handleClick = async () =>
+  {
+    const response = await fetch ("http://localhost:8000/api/subnet", {
+      method : "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ ip })
+    });
+    const data = await response.json();
+    setResult(data);
+  }
 
   return (
     <div>
@@ -56,13 +75,24 @@ export default function App() {
 
       <input
         className="field"
-        defaultValue="192.168.1.0/24"
+        value={ip}
         spellCheck="false"
         autoComplete="off"
         aria-label="IP address and prefix"
+        onChange={(e) => setIp(e.target.value)}
       />
+
+      <button className="btn" onClick={handleClick}>
+        Berechnen →
+      </button>
+
       <p className="hint">
-        Adresse mit Schrägstrich eingeben, oder den Prefix ziehen.
+        {!result
+          ? "Adresse eingeben und Berechnen klicken."
+          : result.error
+          ? <> Error: <span style={{ color: "red", fontFamily: "var(--mono)" }}>{result.error}</span> </>
+          : <> Binär: <span style={{ color: "var(--net)", fontFamily: "var(--mono)" }}>{result.binary}</span></>
+        }
       </p>
 
       <div className="prefix">

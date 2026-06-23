@@ -148,6 +148,31 @@ input[type="range"]::-moz-range-thumb {
 .v.host { color: var(--host); }
 .v .dim { color: var(--muted); }
 
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 10px 24px;
+  background: transparent;
+  border: 1.5px solid var(--net);
+  border-radius: 6px;
+  color: var(--net);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, transform .1s ease;
+}
+.btn:hover {
+  background: var(--net);
+  color: var(--ink);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
 @media (max-width: 460px) {
   .row2 { grid-template-columns: 1fr; }
   #root { padding-top: 54px; }
