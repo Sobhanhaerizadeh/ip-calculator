@@ -1,3 +1,5 @@
+import {useState} from 'react';
+
 // Beispiel-Bits fuer 192.168.1.0, Prefix /24 (erste 24 Bit = network)
 const octets = [
   { bits: "11000000", dec: 192, type: "net" },
@@ -43,6 +45,9 @@ function Strip() {
 }
 
 export default function App() {
+
+  const [prefix, setPrefix] = useState(24);
+
   return (
     <div>
       <p className="eyebrow">
@@ -52,7 +57,6 @@ export default function App() {
       <input
         className="field"
         defaultValue="192.168.1.0/24"
-        readOnly
         spellCheck="false"
         autoComplete="off"
         aria-label="IP address and prefix"
@@ -62,12 +66,13 @@ export default function App() {
       </p>
 
       <div className="prefix">
-        <span className="num">/24</span>
+        <span className="num">/{prefix}</span>
         <input
           type="range"
           min="0"
           max="32"
-          defaultValue={24}
+          value={prefix}
+          onChange={(e) => setPrefix(Number(e.target.value))}
           aria-label="prefix length"
         />
         <span className="lab">prefix</span>
@@ -80,7 +85,7 @@ export default function App() {
           <div className="cell">
             <p className="k">Network</p>
             <p className="v net">
-              192.168.1.0<span className="dim">/24</span>
+              192.168.1.0<span className="dim">/{prefix}</span>
             </p>
           </div>
           <div className="cell">
