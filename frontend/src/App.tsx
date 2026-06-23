@@ -1,11 +1,35 @@
 import {useState, useEffect} from 'react';
 
-// Beispiel-Bits fuer 192.168.1.0, Prefix /24 (erste 24 Bit = network)
+export default function App() {
+
+  const [prefix, setPrefix] = useState(24);
+  const [ip, setIp] = useState(`192.168.1.1/${prefix}`);
+  const [result, setResult] = useState<{ ip: string; binary: string; prefix_binary: string; error?: string } | null>(null);
+
+  useEffect(() =>
+  {
+    const ipWithoutPrefix = ip.split('/')[0];
+    setIp(`${ipWithoutPrefix}/${prefix}`);
+  }, [prefix]);
+
+  const handleClick = async () =>
+  {
+    const response = await fetch ("http://localhost:8000/api/subnet", {
+      method : "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ ip })
+    });
+    const data = await response.json();
+    setResult(data);
+  }
+
+  
 const octets = [
-  { bits: "11000000", dec: 192, type: "net" },
-  { bits: "10101000", dec: 168, type: "net" },
-  { bits: "00000001", dec: 1, type: "net" },
-  { bits: "00000000", dec: 0, type: "host" },
+  { bits: result?.binary?.split(".")[0] || "10101000", dec: result?.ip?.split(".")[0] || 192, type: "net" },
+  { bits: result?.binary?.split(".")[1] || "10101000", dec: result?.ip?.split(".")[1] || 168, type: "net" },
+  { bits: result?.binary?.split(".")[2] || "00000001", dec: result?.ip?.split(".")[2] || 1, type: "net" },
+  { bits: result?.binary?.split(".")[3] || "00000000", dec: result?.ip?.split("/")[0]?.split(".")[3] || 0, type: "host" },
+  { bits: result?.prefix_binary || "00011000", dec: `/${result?.ip?.split("/")[1] || prefix}` , type: "net" },
 ];
 
 // 32-Bit-Streifen — nur statisches Markup, keine Berechnung
@@ -43,29 +67,6 @@ function Strip() {
     </div>
   );
 }
-
-export default function App() {
-
-  const [prefix, setPrefix] = useState(24);
-  const [ip, setIp] = useState(`192.168.1.1/${prefix}`);
-  const [result, setResult] = useState<{ ip: string; binary: string; error?: string } | null>(null);
-
-  useEffect(() =>
-  {
-    const ipWithoutPrefix = ip.split('/')[0];
-    setIp(`${ipWithoutPrefix}/${prefix}`);
-  }, [prefix]);
-
-  const handleClick = async () =>
-  {
-    const response = await fetch ("http://localhost:8000/api/subnet", {
-      method : "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ ip })
-    });
-    const data = await response.json();
-    setResult(data);
-  }
 
   return (
     <div>
@@ -115,41 +116,41 @@ export default function App() {
           <div className="cell">
             <p className="k">Network</p>
             <p className="v net">
-              192.168.1.0<span className="dim">/{prefix}</span>
+              ...
             </p>
           </div>
           <div className="cell">
             <p className="k">Broadcast</p>
-            <p className="v host">192.168.1.255</p>
+            <p className="v host">...</p>
           </div>
         </div>
 
         <div className="cell">
           <p className="k">Usable hosts</p>
           <p className="v">
-            192.168.1.1 <span className="dim">&rarr;</span> 192.168.1.254
+            ... <span className="dim">&rarr;</span> ...
           </p>
         </div>
 
         <div className="row2">
           <div className="cell">
             <p className="k">Subnet mask</p>
-            <p className="v">255.255.255.0</p>
+            <p className="v">...</p>
           </div>
           <div className="cell">
             <p className="k">Wildcard</p>
-            <p className="v">0.0.0.255</p>
+            <p className="v">...</p>
           </div>
         </div>
 
         <div className="row2">
           <div className="cell">
             <p className="k">Hosts</p>
-            <p className="v">254</p>
+            <p className="v">...</p>
           </div>
           <div className="cell">
             <p className="k">Total addresses</p>
-            <p className="v">256</p>
+            <p className="v">...</p>
           </div>
         </div>
       </div>
