@@ -29,7 +29,7 @@ const octets = [
   { bits: result?.binary?.split(".")[1] || "10101000", dec: result?.ip?.split(".")[1] || 168, type: "net" },
   { bits: result?.binary?.split(".")[2] || "00000001", dec: result?.ip?.split(".")[2] || 1, type: "net" },
   { bits: result?.binary?.split(".")[3] || "00000000", dec: result?.ip?.split("/")[0]?.split(".")[3] || 0, type: "host" },
-  { bits: result?.prefix_binary || "00011000", dec: result?.ip?.split("/")[1] || prefix , type: "net" },
+  { bits: result?.prefix_binary || "00011000", dec: `/${result?.ip?.split("/")[1] || prefix}` , type: "net" },
 ];
 
 // 32-Bit-Streifen — nur statisches Markup, keine Berechnung
