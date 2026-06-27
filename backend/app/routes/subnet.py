@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from app.services.subnet_calculator import calculate_subnet
+
 
 router = APIRouter()
 
