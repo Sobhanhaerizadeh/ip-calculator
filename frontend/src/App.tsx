@@ -84,28 +84,36 @@ function Strip() {
 
   return (
     <div>
-      <p className="eyebrow">
-        subnet <b>·</b> ipv4
-      </p>
+      <header className="header">
+        <div className="logo">IP</div>
+        <p className="eyebrow">subnet <b>·</b> ipv4 calculator</p>
+      </header>
 
       <input
         className="field"
         value={ip}
         spellCheck="false"
-        autoComplete="off"  
+        autoComplete="off"
+        placeholder="192.168.1.1/24"
         aria-label="IP address and prefix"
         onChange={(e) => {
-          setIp(e.target.value)
-          if (e.target.value.split("/")[0].trim() == "") setResult(null);
+          setIp(e.target.value);
+          if (e.target.value.split("/")[0].trim() === "") setResult(null);
         }}
+        onKeyDown={(e) => e.key === "Enter" && handleClick()}
       />
 
       <button className="btn" onClick={handleClick}>
         Berechnen →
       </button>
 
-      <p className="hint">
-        Adresse eingeben und Berechnen klicken.
+      <p className={`hint${result?.error ? " err" : ""}`}>
+        {!result
+          ? "IP-Adresse eingeben und Enter oder Berechnen klicken."
+          : result.error
+          ? <><span style={{ fontFamily: "var(--mono)" }}>⚠ </span>{result.error}</>
+          : null
+        }
       </p>
 
       <div className="prefix">
