@@ -34,8 +34,11 @@ def subnet(request: IPRequest):
     
     prefix_binary = format(int(prefix), "08b")
 
+    result = calculate_subnet(request.ip)
+
     return {
         "ip": request.ip,
         "binary": ".".join(binary_octets),
         "prefix_binary": prefix_binary,
+        **result
     }

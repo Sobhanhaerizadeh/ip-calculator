@@ -4,7 +4,21 @@ export default function App() {
 
   const [prefix, setPrefix] = useState(24);
   const [ip, setIp] = useState(`192.168.1.1/${prefix}`);
-  const [result, setResult] = useState<{ ip: string; binary: string; prefix_binary: string; error?: string } | null>(null);
+  const [result, setResult] = useState<{ 
+    ip: string;
+    binary: string;
+    prefix_binary: string;
+    error?: string;
+    networkAddress?: string;
+    broadcastAddress?: string;
+    subnetMask?: string;
+    wildcardMask?: string;
+    firstUsableHost?: string;
+    lastUsableHost?: string;
+    usableHosts?: number;
+    totalAddresses?: number;
+
+  } | null>(null);
 
   useEffect(() =>
   {
@@ -78,9 +92,12 @@ function Strip() {
         className="field"
         value={ip}
         spellCheck="false"
-        autoComplete="off"
+        autoComplete="off"  
         aria-label="IP address and prefix"
-        onChange={(e) => setIp(e.target.value)}
+        onChange={(e) => {
+          setIp(e.target.value)
+          if (e.target.value.split("/")[0].trim() == "") setResult(null);
+        }}
       />
 
       <button className="btn" onClick={handleClick}>
@@ -88,12 +105,7 @@ function Strip() {
       </button>
 
       <p className="hint">
-        {!result
-          ? "Adresse eingeben und Berechnen klicken."
-          : result.error
-          ? <> Error: <span style={{ color: "red", fontFamily: "var(--mono)" }}>{result.error}</span> </>
-          : <> Binär: <span style={{ color: "var(--net)", fontFamily: "var(--mono)" }}>{result.binary}</span></>
-        }
+        Adresse eingeben und Berechnen klicken.
       </p>
 
       <div className="prefix">
@@ -116,41 +128,52 @@ function Strip() {
           <div className="cell">
             <p className="k">Network</p>
             <p className="v net">
-              ...
+              {result?.networkAddress || "192.168.1.0"}
             </p>
           </div>
           <div className="cell">
             <p className="k">Broadcast</p>
-            <p className="v host">...</p>
+            <p className="v host">{result?.broadcastAddress || "192.168.1.255"}</p>
           </div>
         </div>
 
         <div className="cell">
-          <p className="k">Usable hosts</p>
+          <p className="k">First Usable Host</p>
           <p className="v">
-            ... <span className="dim">&rarr;</span> ...
+            {result?.firstUsableHost || "192.168.1.1"}
+          </p>
+        </div>
+
+        <div className="cell">
+          <p className="k">Last Usable Host</p>
+          <p className="v">
+           {result?.lastUsableHost || "192.168.1.254"}
           </p>
         </div>
 
         <div className="row2">
           <div className="cell">
             <p className="k">Subnet mask</p>
-            <p className="v">...</p>
+            <p className="v">{result?.subnetMask || "255.255.255.0"}</p>
           </div>
           <div className="cell">
             <p className="k">Wildcard</p>
-            <p className="v">...</p>
+            <p className="v">{result?.wildcardMask || "0.0.0.255"}</p>
           </div>
         </div>
 
         <div className="row2">
           <div className="cell">
-            <p className="k">Hosts</p>
-            <p className="v">...</p>
+            <p className="k">Usable Hosts</p>
+            <p className="v">
+              {result?.usableHosts || "254"}
+            </p>
           </div>
           <div className="cell">
             <p className="k">Total addresses</p>
-            <p className="v">...</p>
+            <p className="v">
+              {result?.totalAddresses || "256"}
+            </p>
           </div>
         </div>
       </div>
