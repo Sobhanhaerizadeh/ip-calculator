@@ -1,9 +1,9 @@
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 
 export default function App() {
 
   const [prefix, setPrefix] = useState(24);
-  const [ip, setIp] = useState(`192.168.1.1/${prefix}`);
+  const [ip, setIp] = useState("192.168.1.1");
   const [result, setResult] = useState<{ 
     ip: string;
     binary: string;
@@ -20,18 +20,12 @@ export default function App() {
 
   } | null>(null);
 
-  useEffect(() =>
-  {
-    const ipWithoutPrefix = ip.split('/')[0];
-    setIp(`${ipWithoutPrefix}/${prefix}`);
-  }, [prefix]);
-
   const handleClick = async () =>
   {
     const response = await fetch ("http://localhost:8000/api/subnet", {
       method : "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ ip })
+      body: JSON.stringify({ ip: `${ip}/${prefix}` })
     });
     const data = await response.json();
     setResult(data);
@@ -39,14 +33,13 @@ export default function App() {
 
   
 const octets = [
-  { bits: result?.binary?.split(".")[0] || "10101000", dec: result?.ip?.split(".")[0] || 192, type: "net" },
-  { bits: result?.binary?.split(".")[1] || "10101000", dec: result?.ip?.split(".")[1] || 168, type: "net" },
-  { bits: result?.binary?.split(".")[2] || "00000001", dec: result?.ip?.split(".")[2] || 1, type: "net" },
-  { bits: result?.binary?.split(".")[3] || "00000000", dec: result?.ip?.split("/")[0]?.split(".")[3] || 0, type: "host" },
-  { bits: result?.prefix_binary || "00011000", dec: `/${result?.ip?.split("/")[1] || prefix}` , type: "net" },
+  { bits: result?.binary?.split(".")[0] || "11000000", dec: result?.ip?.split(".")[0] || 192 },
+  { bits: result?.binary?.split(".")[1] || "10101000", dec: result?.ip?.split(".")[1] || 168 },
+  { bits: result?.binary?.split(".")[2] || "00000001", dec: result?.ip?.split(".")[2] || 1 },
+  { bits: result?.binary?.split(".")[3] || "00000000", dec: result?.ip?.split("/")[0]?.split(".")[3] || 0 },
+  // { bits: result?.prefix_binary || "00011000", dec: `/${result?.ip?.split("/")[1] || prefix}` },
 ];
 
-// 32-Bit-Streifen — nur statisches Markup, keine Berechnung
 function Strip() {
   return (
     <div className="strip">
@@ -55,11 +48,13 @@ function Strip() {
           <div className="octet" key={gi}>
             <div className="bits">
               {o.bits.split("").map((val, bi) => {
-                const isCut = gi * 8 + bi === 24; // Prefix-Schnitt bei /24
+                const globalBit = gi * 8 + bi;
+                const isHost = gi < 4 && globalBit >= prefix;
+                const isCut = gi < 4 && globalBit === prefix;
                 return (
                   <div
                     key={bi}
-                    className={"bit " + o.type + (isCut ? " cut" : "")}
+                    className={`bit ${isHost ? "host" : "net"}${isCut ? " cut" : ""}`}
                   >
                     {val}
                   </div>
@@ -89,19 +84,23 @@ function Strip() {
         <p className="eyebrow">subnet <b>·</b> ipv4 calculator</p>
       </header>
 
-      <input
-        className="field"
-        value={ip}
-        spellCheck="false"
-        autoComplete="off"
-        placeholder="192.168.1.1/24"
-        aria-label="IP address and prefix"
-        onChange={(e) => {
-          setIp(e.target.value);
-          if (e.target.value.split("/")[0].trim() === "") setResult(null);
-        }}
-        onKeyDown={(e) => e.key === "Enter" && handleClick()}
-      />
+      <div className="field-wrap">
+        <input
+          className="field"
+          value={ip}
+          spellCheck="false"
+          autoComplete="off"
+          placeholder="192.168.1.1"
+          aria-label="IP address"
+          onChange={(e) => {
+            const value = e.target.value;
+            setIp(value);
+            if (value.trim() === "") setResult(null);
+          }}
+          onKeyDown={(e) => e.key === "Enter" && handleClick()}
+        />
+        <span className="field-prefix">/{prefix}</span>
+      </div>
 
       <button className="btn" onClick={handleClick}>
         Berechnen →
